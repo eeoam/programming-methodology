@@ -1,7 +1,7 @@
 module boolean where
 
 Some algebraic preliminaries.
-```
+```agda
 data _≈_ {A : Set} (x : A) : A → Set where
     refl : x ≈ x
 infix 4 _≈_
@@ -62,14 +62,14 @@ Associative _·_ = ∀ x y z → ((x · y) · z) ≈ (x · (y · z))
 ```
 
 A boolean is a value of type 𝔹. There are only two such values: `true` and `false`.
-```
+```agda
 data 𝔹 : Set where
     true  : 𝔹
     false : 𝔹
 ```
 
 We will be working with the following boolean operators.
-```
+```agda
 ¬ : Op₁ 𝔹
 ¬ true = false
 ¬ false = true
@@ -111,8 +111,8 @@ false ∧ true = false
 false ∧ false = false
 ```
 
-Left first investigate the properties of ¬ .
-```
+Let us first investigate the properties of ¬ .
+```agda
 ¬-involutive : Involutive ¬
 ¬-involutive true = refl
 ¬-involutive false = refl
@@ -126,7 +126,7 @@ Left first investigate the properties of ¬ .
 ```
 
 Next, let us investigate the properties of _≡_.
-```
+```agda
 ≡-left-identity : LeftIdentity true _≡_ 
 ≡-left-identity true = refl
 ≡-left-identity false = refl
@@ -156,7 +156,7 @@ Next, let us investigate the properties of _≡_.
 ```
 
 The properties of _≢_ match those of ≡ .
-```
+```agda
 ≢-left-identity : LeftIdentity false _≢_ 
 ≢-left-identity true = refl
 ≢-left-identity false = refl
@@ -186,7 +186,7 @@ The properties of _≢_ match those of ≡ .
 ```
 
 Next, let's prove some properties of ⇒ and ⇐ .
-```
+```agda
 ⇒-left-identity : LeftIdentity true _⇒_
 ⇒-left-identity true = refl
 ⇒-left-identity false = refl
@@ -205,8 +205,7 @@ Next, let's prove some properties of ⇒ and ⇐ .
 ```
 
 Finally for now, let us prove some properties of ∨ and ∧ .
-```
---idempotence
+```agda
 
 ∨-idempotence : Idempotent _∨_
 ∨-idempotence true = refl
@@ -269,4 +268,4 @@ Finally for now, let us prove some properties of ∨ and ∧ .
 ∧-associative false true false = refl
 ∧-associative false false true = refl
 ∧-associative false false false = refl
-
+```
