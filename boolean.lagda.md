@@ -155,6 +155,7 @@ Next, let us investigate the properties of _≡_.
 ≡-associative false false false = refl
 ```
 
+
 The properties of _≢_ match those of ≡ .
 ```agda
 ≢-left-identity : LeftIdentity false _≢_ 
@@ -268,4 +269,36 @@ Finally for now, let us prove some properties of ∨ and ∧ .
 ∧-associative false true false = refl
 ∧-associative false false true = refl
 ∧-associative false false false = refl
+```
+# Additional properties
+
+We can obtain theorems involving ≈ into theorems involving ≡ on account of:
+```agda
+≈→≡ : ∀(a b : 𝔹) → a ≈ b → a ≡ b ≈ true
+≈→≡ true true a≈b = refl
+≈→≡ true false = λ ()
+≈→≡ false false a≈b = refl
+
+≡-reflexive' : ∀ (a : 𝔹) → a ≡ a ≈ true
+≡-reflexive' a = ≈→≡ a a refl
+
+≡-left-identity' : ∀ (a : 𝔹) → (true ≡ a) ≡ a ≈ true
+≡-left-identity' a = ≈→≡ (true ≡ a) a (≡-left-identity a)
+
+≡-right-identity' : ∀ (a : 𝔹) → (a ≡ true) ≡ a ≈ true
+≡-right-identity' a = ≈→≡ (a ≡ true) a (≡-right-identity a)
+
+≡-identity' : ∀ (a : 𝔹) → ((true ≡ a) ≡ a ≈ true) × ((a ≡ true) ≡ a ≈ true)
+≡-identity' a = (≡-left-identity' a , ≡-right-identity' a)
+
+≡-symmetric' : ∀ (a b : 𝔹) → (a ≡ b) ≡ (b ≡ a) ≈ true
+≡-symmetric' a b = ≈→≡ (a ≡ b) (b ≡ a) (≡-symmetric a b)
+
+≡-associative' : ∀ (a b c : 𝔹) → ((a ≡ b) ≡ c) ≡ (a ≡ (b ≡ c)) ≈ true
+≡-associative' a b c = ≈→≡ ((a ≡ b) ≡ c) (a ≡ (b ≡ c)) (≡-associative a b c)
+```
+
+```agda
+≢-irreflexive' : ∀ (a : 𝔹) → a ≢ a ≈ false
+≢-irreflexive' a = {!   !}
 ```
