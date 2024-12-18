@@ -70,9 +70,17 @@ data 𝔹 : Set where
 
 We will be working with the following boolean operators.
 ```agda
+infix 6 _⇒_
+infix 6 _⇐_
+infix 5 _≡_
+infix 5 _≢_
+infix 7 _∧_
+infix 7 _∨_
+
 ¬ : Op₁ 𝔹
 ¬ true = false
 ¬ false = true
+
 
 _≡_ : Op₂ 𝔹
 true ≡ true = true
@@ -98,11 +106,13 @@ true ⇐ false = true
 false ⇐ true = false
 false ⇐ false = true
 
+
 _∨_ : Op₂ 𝔹
 true ∨ true = true
 true ∨ false = true
 false ∨ true = true
 false ∨ false = false
+
 
 _∧_ : Op₂ 𝔹
 true ∧ true = true
@@ -271,14 +281,66 @@ Finally for now, let us prove some properties of ∨ and ∧ .
 ∧-associative false false false = refl
 ```
 # Additional properties
-
-We can obtain theorems involving ≈ into theorems involving ≡ on account of:
+First a bit of notation.
 ```agda
-≈→≡ : ∀(a b : 𝔹) → a ≈ b → a ≡ b ≈ true
+⌈_⌋ : 𝔹 → Set
+⌈ a ⌋ = a ≈ true
+```
+
+We can obtain boolean equivalences from boolean equalities on account of:
+```agda
+≈→≡ : ∀(a b : 𝔹) → a ≈ b → ⌈ a ≡ b ⌋
 ≈→≡ true true a≈b = refl
 ≈→≡ true false = λ ()
 ≈→≡ false false a≈b = refl
+```
 
+Let's see some of the new theorems `≈→≡` gives us.
+```agda
+¬-involutive' : ∀ (a : 𝔹) → ⌈ ¬ (¬ a) ≡ a ⌋
+¬-involutive' a = ≈→≡ (¬(¬ a)) a (¬-involutive a)
+
+¬-galois : ∀ (a b : 𝔹) → (¬ a ≡ b) ≈ (a ≡ ¬ b)
+¬-galois true true = refl
+¬-galois true false = refl
+¬-galois false true = refl
+¬-galois false false = refl
+
+¬-galois' : ∀ (a b : 𝔹) → ⌈ (¬ a ≡ b) ≡ (a ≡ ¬ b) ⌋
+¬-galois' a b = ≈→≡ (¬ a ≡ b) (a ≡ ¬ b) (¬-galois a b)
+```
+
+```agda
+⇒-reflexive : ∀ (a : 𝔹) → a ⇒ a ≈ true
+⇒-reflexive true = refl
+⇒-reflexive false = refl
+
+⇒-reflexive' : ∀ (a : 𝔹) → ⌈ a ⇒ a ≡ true ⌋
+⇒-reflexive' a =  ≈→≡ (a ⇒ a) true (⇒-reflexive a)
+
+⇒-left-identity' : ∀ (a : 𝔹) → ⌈ true ⇒ a ≡ a ⌋
+⇒-left-identity' a = ≈→≡ (true ⇒ a) a (⇒-left-identity a)
+
+⇒-right-zero' : ∀ (a : 𝔹) → ⌈ a ⇒ true ≡ true ⌋
+⇒-right-zero' a = ≈→≡ (a ⇒ true) true (⇒-right-zero a)
+```
+
+```agda
+⇐-reflexive : ∀ (a : 𝔹) → a ⇐ a ≈ true
+⇐-reflexive true = refl
+⇐-reflexive false = refl
+
+⇐-reflexive' : ∀ (a : 𝔹) → ⌈ a ⇐ a ≡ true ⌋
+⇐-reflexive' a = ≈→≡ (a ⇐ a) true (⇐-reflexive a)
+
+⇐-right-identity' : ∀ (a : 𝔹) → ⌈ a ⇐ true ≡ a ⌋
+⇐-right-identity' a = ≈→≡ (a ⇐ true) a (⇐-right-identity a)
+
+⇐-left-zero' : ∀ (a : 𝔹) → ⌈ true ⇐ a ≡ true ⌋
+⇐-left-zero' a = ≈→≡ (true ⇐ a) true (⇐-left-zero a)
+```
+
+```agda
 ≡-reflexive' : ∀ (a : 𝔹) → a ≡ a ≈ true
 ≡-reflexive' a = ≈→≡ a a refl
 
@@ -298,7 +360,63 @@ We can obtain theorems involving ≈ into theorems involving ≡ on account of:
 ≡-associative' a b c = ≈→≡ ((a ≡ b) ≡ c) (a ≡ (b ≡ c)) (≡-associative a b c)
 ```
 
+```agda 
+≢-irreflexive : ∀ (a : 𝔹) → a ≢ a ≈ false
+≢-irreflexive true = refl
+≢-irreflexive false = refl
+
+≢-left-identity' : ∀ (a : 𝔹) → (false ≢ a) ≡ a ≈ true
+≢-left-identity' a = ≈→≡ (false ≢ a) a (≢-left-identity a)
+
+≢-right-identity' : ∀ (a : 𝔹) → (a ≢ false) ≡ a ≈ true
+≢-right-identity' a = ≈→≡ (a ≢ false) a (≢-right-identity a)
+
+≢-identity' : ∀ (a : 𝔹) → ((false ≢ a) ≡ a ≈ true) × ((a ≢ false) ≡ a ≈ true)
+≢-identity' a = (≢-left-identity' a , ≢-right-identity' a)
+
+≢-symmetric' : ∀ (a b : 𝔹) → (a ≢ b) ≡ (b ≢ a) ≈ true
+≢-symmetric' a b = ≈→≡ (a ≢ b) (b ≢ a) (≢-symmetric a b)
+
+≢-associative' : ∀ (a b c : 𝔹) → ((a ≢ b) ≢ c) ≡ (a ≢ (b ≢ c)) ≈ true
+≢-associative' a b c = ≈→≡ ((a ≢ b) ≢ c) (a ≢ (b ≢ c)) (≢-associative a b c)
+```
+
 ```agda
-≢-irreflexive' : ∀ (a : 𝔹) → a ≢ a ≈ false
-≢-irreflexive' a = {!   !}
+∨-idempotent' : ∀ (a : 𝔹) → ⌈ a ∨ a ≡ a ⌋
+∨-idempotent' a = ≈→≡ (a ∨ a) a (∨-idempotence a)
+
+∨-left-identity' : ∀ (a : 𝔹) → ⌈ false ∨ a ≡ a ⌋
+∨-left-identity' a = ≈→≡ (false ∨ a) a (∨-left-identity a)
+
+∨-right-identity' : ∀ (a : 𝔹) → ⌈ a ∨ false ≡ a ⌋
+∨-right-identity' a = ≈→≡ (a ∨ false) a (∨-right-identity a)
+
+∨-identity' : ∀ (a : 𝔹) → ⌈ false ∨ a ≡ a ⌋ × ⌈ a ∨ false ≡ a ⌋
+∨-identity' a = (∨-left-identity' a , ∨-right-identity' a)
+
+∨-symmetric' : ∀ (a b : 𝔹) → ⌈ a ∨ b ≡ b ∨ a ⌋
+∨-symmetric' a b = ≈→≡ (a ∨ b) (b ∨ a) (∨-symmetric a b)
+
+∨-associative' : ∀ (a b c : 𝔹) → ⌈ (a ∨ b) ∨ c ≡ a ∨ (b ∨ c) ⌋
+∨-associative' a b c = ≈→≡ ((a ∨ b) ∨ c ) (a ∨ (b ∨ c)) (∨-associative a b c)
+```
+
+```agda
+∧-idempotent' : ∀ (a : 𝔹) → ⌈ a ∨ a ≡ a ⌋
+∧-idempotent' a = ≈→≡ (a ∨ a) a (∨-idempotence a)
+
+∧-left-identity' : ∀ (a : 𝔹) → ⌈ true ∧ a ≡ a ⌋
+∧-left-identity' a = ≈→≡ (true ∧ a) a (∧-left-identity a)
+
+∧-right-identity' : ∀ (a : 𝔹) → ⌈ a ∧ true ≡ a ⌋
+∧-right-identity' a = ≈→≡ (a ∧ true) a (∧-right-identity a)
+
+∧-identity' : ∀ (a : 𝔹) → ⌈ true ∧ a ≡ a ⌋ × ⌈ a ∧ true ≡ a ⌋
+∧-identity' a = (∧-left-identity' a , ∧-right-identity' a)
+
+∧-symmetric' : ∀ (a b : 𝔹) → ⌈ a ∧ b ≡ b ∧ a ⌋
+∧-symmetric' a b = ≈→≡ (a ∧ b) (b ∧ a) (∧-symmetric a b)
+
+∧-associative' : ∀ (a b c : 𝔹) → ⌈ (a ∧ b) ∧ c ≡ a ∧ (b ∧ c) ⌋
+∧-associative' a b c = ≈→≡ ((a ∧ b) ∧ c) (a ∧ (b ∧ c)) (∧-associative a b c)
 ```
