@@ -16,7 +16,7 @@ This has led me to the definition of the following operator on Agda:
 ```
 
 Armed with `≈→≡` I have restated many of the equalities for negation, implication, conjunction etc.
-as equivalences. The corresponding Agda proofs can be found [here](). 
+as equivalences. The corresponding Agda proofs can be found [here](https://github.com/eeoam/programming-methodology/blob/b729eff7eb668e5fbaa6d78e93787c705189aee2/boolean.lagda.md?plain=1#L283). 
 
 In the process of proving equivalences, I found it necessary to add some new equality theorems viz.
 ```agda
