@@ -1,6 +1,8 @@
 
 [Algebraic preliminaries](#some-algebraic-preliminaries)
+
 [Equivalences from equalities](#equivalences-from-equalities)
+
 [Implications from functions](#implications-from-functions)
 
 # Some algebraic preliminaries.
@@ -488,7 +490,12 @@ A →⟨ A→B ⟩ B→C = →-trans A→B B→C
 ```
 
 →        (\r)
+
+
 ←        (\l)
+
 λ U+03BB (\Gl)
+
 ∘ U+2218 (\o)
+
 □ U+25A1
