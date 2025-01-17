@@ -1,7 +1,12 @@
+
+[Algebraic preliminaries](#some-algebraic-preliminaries)
+[Equivalences from equalities](#equivalences-from-equalities)
+[Implications from functions](#implications-from-functions)
+
+# Some algebraic preliminaries.
+```agda
 module boolean where
 
-Some algebraic preliminaries.
-```agda
 data _≈_ {A : Set} (x : A) : A → Set where
     refl : x ≈ x
 infix 4 _≈_
@@ -280,7 +285,7 @@ Finally for now, let us prove some properties of ∨ and ∧ .
 ∧-associative false false true = refl
 ∧-associative false false false = refl
 ```
-# Additional properties
+# Equivalences from equalities
 First a bit of notation.
 ```agda
 ⌈_⌋ : 𝔹 → Set
@@ -420,3 +425,70 @@ Let's see some of the new theorems `≈→≡` gives us.
 ∧-associative' : ∀ (a b c : 𝔹) → ⌈ (a ∧ b) ∧ c ≡ a ∧ (b ∧ c) ⌋
 ∧-associative' a b c = ≈→≡ ((a ∧ b) ∧ c) (a ∧ (b ∧ c)) (∧-associative a b c)
 ```
+
+# Implications from functions
+```agda
+open import Data.Empty using (⊥)
+open import Data.Unit using (⊤; tt)
+open import Function using (_∘_)
+
+→-refl : ∀ {A : Set} → A → A
+→-refl = λ x → x 
+
+→-le : ∀ {A : Set} → ⊥ → A
+→-le = λ ()
+
+→-ge : ∀{A : Set} → A → ⊤
+→-ge = λ _ → tt
+
+→-modus-ponens : ∀ {A B : Set} → (A → B) → A → B
+→-modus-ponens f a = f a
+
+→-trans : ∀ {A B C : Set} → (A → B) → (B → C) → (A → C)
+→-trans A→B B→C = B→C ∘ A→B
+
+infix 3 _□
+_□ : ∀ (A : Set) → A → A
+A □ = →-refl
+
+infixr 2 _→⟨⟩_
+_→⟨⟩_ : ∀ (A : Set){B : Set} → (A → B) → (A → B)
+A →⟨⟩ A→B = A→B
+
+infixr 2 _→⟨_⟩_
+_→⟨_⟩_ : ∀(A : Set){B C : Set} → (A → B) → (B → C) → (A → C)
+A →⟨ A→B ⟩ B→C = →-trans A→B B→C
+
+→-⇒ : ∀ (a b : 𝔹) → (⌈ a ⌋ → ⌈ b ⌋) → ⌈ a ⇒ b ⌋
+→-⇒ true true f = refl
+→-⇒ true false f = f refl
+→-⇒ false true f = refl
+→-⇒ false false f = refl
+
+⇒-refl : ∀ (a : 𝔹) → ⌈ a ⇒ a ⌋
+⇒-refl a = →-⇒ a a (λ z → z)
+
+⇒-le : ∀ (a : 𝔹) → ⌈ false ⇒ a ⌋
+⇒-le a = →-⇒ false a (λ ())
+
+⇒-ge : ∀ (a : 𝔹) → ⌈ a ⇒ true ⌋
+⇒-ge a = →-⇒ a true (λ _ → refl)
+
+⇒-modus-ponens : ∀ (a b : 𝔹) → ⌈ a ⇒ b ⌋ → ⌈ a ⌋ → ⌈ b ⌋
+⇒-modus-ponens true true a⇒b a≈true = refl
+
+⇒-trans : ∀ (a b c : 𝔹) → ⌈ a ⇒ b ⌋ → ⌈ b ⇒ c ⌋ → ⌈ a ⇒ c ⌋
+⇒-trans a b c a⇒b b⇒c = →-⇒ a c (g ∘ f)
+    where
+        f : ⌈ a ⌋ → ⌈ b ⌋
+        f = ⇒-modus-ponens a b a⇒b
+
+        g : ⌈ b ⌋ → ⌈ c ⌋
+        g = ⇒-modus-ponens b c b⇒c
+```
+
+→        (\r)
+←        (\l)
+λ U+03BB (\Gl)
+∘ U+2218 (\o)
+□ U+25A1
