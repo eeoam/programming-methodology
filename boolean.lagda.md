@@ -9,22 +9,7 @@
 ```agda
 module boolean where
 
-data _≈_ {A : Set} (x : A) : A → Set where
-    refl : x ≈ x
-infix 4 _≈_
-
-pattern erefl x = refl {x = x}
-
-trans : ∀ {A : Set} {x y z : A} → x ≈ y → y ≈ z → x ≈ z
-trans refl refl = refl
-
-module ≈-Reasoning {A : Set} where
-
-    _∎ : ∀ (x : A) → x ≈ x
-    x ∎ = erefl x
-
-    _≈⟨_⟩_ : ∀(x : A) {y z : A} → x ≈ y → y ≈ z → x ≈ z
-    x ≈⟨ x≈y ⟩ y≈z = trans x≈y y≈z
+open import metalanguage
 
 
 Op₁ : ∀ {ℓ} → Set ℓ → Set ℓ
@@ -434,32 +419,7 @@ open import Data.Empty using (⊥)
 open import Data.Unit using (⊤; tt)
 open import Function using (_∘_)
 
-→-refl : ∀ {A : Set} → A → A
-→-refl = λ x → x 
 
-→-le : ∀ {A : Set} → ⊥ → A
-→-le = λ ()
-
-→-ge : ∀{A : Set} → A → ⊤
-→-ge = λ _ → tt
-
-→-modus-ponens : ∀ {A B : Set} → (A → B) → A → B
-→-modus-ponens f a = f a
-
-→-trans : ∀ {A B C : Set} → (A → B) → (B → C) → (A → C)
-→-trans A→B B→C = B→C ∘ A→B
-
-infix 3 _□
-_□ : ∀ (A : Set) → A → A
-A □ = →-refl
-
-infixr 2 _→⟨⟩_
-_→⟨⟩_ : ∀ (A : Set){B : Set} → (A → B) → (A → B)
-A →⟨⟩ A→B = A→B
-
-infixr 2 _→⟨_⟩_
-_→⟨_⟩_ : ∀(A : Set){B C : Set} → (A → B) → (B → C) → (A → C)
-A →⟨ A→B ⟩ B→C = →-trans A→B B→C
 
 →-⇒ : ∀ (a b : 𝔹) → (⌈ a ⌋ → ⌈ b ⌋) → ⌈ a ⇒ b ⌋
 →-⇒ true true f = refl
@@ -487,7 +447,50 @@ A →⟨ A→B ⟩ B→C = →-trans A→B B→C
 
         g : ⌈ b ⌋ → ⌈ c ⌋
         g = ⇒-modus-ponens b c b⇒c
+
+⇒-antisym : ∀ (a b : 𝔹) → ⌈ a ⇒ b ⌋ → ⌈ b ⇒ a ⌋ → a ≈ b
+⇒-antisym true true a⇒b b⇒a = refl
+⇒-antisym false false a⇒b b⇒a = refl
+
+mutual-inequalityl : ∀ (a b : 𝔹) → ⌈ a ⇒ b ⌋ × ⌈ b ⇒ a ⌋ → ⌈ a ≡ b ⌋
+mutual-inequalityl true true (a⇒b , b⇒a) = refl
+mutual-inequalityl false false (a⇒b , b⇒a) = refl
+
+mutual-inequalityr : ∀ (a b : 𝔹) → ⌈ a ≡ b ⌋ → ⌈ a ⇒ b ⌋ × ⌈ b ⇒ a ⌋
+mutual-inequalityr true true a≡b = refl , refl
+mutual-inequalityr false false a≡b = refl , refl -- half the battle is being able to say what the problem is
+
+mutual-inequalitylr : ∀ (a b : 𝔹) → (x : ⌈ a ≡ b ⌋) → mutual-inequalityl a b (mutual-inequalityr a b x) ≈ x
+mutual-inequalitylr true true refl = refl
+mutual-inequalitylr false false refl = refl
+
+mutual-inequalityrl : ∀ (a b : 𝔹) → (y : ⌈ a ⇒ b ⌋ × ⌈ b ⇒ a ⌋) → mutual-inequalityr a b (mutual-inequalityl a b y) ≈ y
+mutual-inequalityrl true true (refl , refl) = refl
+mutual-inequalityrl false false (refl , refl) = refl
+
+mutual-inequality : ∀ (a b : 𝔹) → ⌈ a ≡ b ⌋ ≃ ⌈ a ⇒ b ⌋ × ⌈ b ⇒ a ⌋
+mutual-inequality a b =
+    record
+        { to = mutual-inequalityr a b
+        ; from = mutual-inequalityl a b
+        ; from∘to = mutual-inequalitylr a b
+        ; to∘from = mutual-inequalityrl a b
+        }
 ```
+
+# Isomorphisms
+
+
+--- remove below b4 checkin
+```agda
+
+```
+
+a => b
+= a = b (* need to define cong for -> *)
+b => b
+= a = b
+b => a ∎
 
 →        (\r)
 
@@ -497,5 +500,7 @@ A →⟨ A→B ⟩ B→C = →-trans A→B B→C
 λ U+03BB (\Gl)
 
 ∘ U+2218 (\o)
-
+ 
 □ U+25A1
+  
+𝔹 (\bB) 
