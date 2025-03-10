@@ -20,7 +20,6 @@ open import Function using (_∘_)
 
 →-trans : ∀ {A B C : Set} → (A → B) → (B → C) → (A → C)
 →-trans A→B B→C = B→C ∘ A→B
-```
 
 infix 3 _□
 _□ : ∀ (A : Set) → A → A
@@ -33,7 +32,7 @@ A →⟨⟩ A→B = A→B
 infixr 2 _→⟨_⟩_
 _→⟨_⟩_ : ∀(A : Set){B C : Set} → (A → B) → (B → C) → (A → C)
 A →⟨ A→B ⟩ B→C = →-trans A→B B→C
-
+```
 
 ```agda
 _←_ : ∀ (A B : Set) → Set
@@ -55,6 +54,7 @@ A ← B = B → A
 ←-trans A←B B←C = A←B ∘ B←C 
 ```
 
+# Equality
 ```agda
 data _≈_ {A : Set} (x : A) : A → Set where
     refl : x ≈ x
@@ -81,7 +81,7 @@ leibniz : ∀ {A B : Set} (f : A → B) {x y : A} → x ≈ y → f x ≈ f y
 leibniz f refl = refl
 ```
 
-## Isomorphism
+# Isomorphism
 ```agda
 infix 0 _≃_
 record _≃_ (A B : Set) : Set where
